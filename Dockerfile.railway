@@ -1,9 +1,9 @@
 # NanoClaw Railway Deployment Dockerfile
-# Clones and builds NanoClaw from source
+# Clones and builds NanoClaw, runs in NO_CONTAINER mode (no Docker daemon)
 
 FROM node:22-slim
 
-# Install system dependencies
+# Install system dependencies (no Docker CLI needed — NO_CONTAINER mode)
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -12,32 +12,35 @@ RUN apt-get update && apt-get install -y \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Docker CLI (for container runtime)
-RUN curl -fsSL https://get.docker.com | sh || echo "Docker install skipped - will use system Docker"
-
 WORKDIR /app
 
 # Clone NanoClaw source
 RUN git clone https://github.com/qwibitai/nanoclaw.git .
 
-# Install dependencies
-RUN npm install
+# Copy and apply Railway patches (before building)
+COPY patches/ ./patches/
+RUN node patches/apply-railway-patch.js
 
-# Build TypeScript
+# Install main dependencies and build
+RUN npm install
 RUN npm run build
 
+# Build agent-runner (separate package with its own dependencies)
+RUN cd container/agent-runner && npm install && npm run build
+
 # Create necessary directories
-RUN mkdir -p data store groups logs container
+RUN mkdir -p data store groups logs
 
 # Set permissions
 RUN chmod -R 755 /app
+
+# NO_CONTAINER mode — required, Railway doesn't support Docker-in-Docker
+ENV NO_CONTAINER=true
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-# Expose port (if needed for web interface)
 EXPOSE 3000
 
-# Start the application
 CMD ["npm", "run", "start"]
