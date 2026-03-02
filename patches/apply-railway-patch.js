@@ -395,6 +395,45 @@ function patchAgentRunnerMcp() {
 }
 
 // ---------------------------------------------------------------------------
+// Patch 5: src/index.ts — add HTTP health server for Railway
+// ---------------------------------------------------------------------------
+function patchIndexAddHealthServer() {
+  const filePath = path.join(SRC_DIR, 'index.ts');
+  let content = fs.readFileSync(filePath, 'utf-8');
+
+  // Add http import at the top (after existing imports)
+  content = content.replace(
+    "import { logger } from './logger.js';",
+    `import { logger } from './logger.js';
+import http from 'http';`,
+  );
+
+  // Find the main() function and add health server startup before it starts the message loop
+  content = content.replace(
+    'startMessageLoop().catch((err) => {',
+    `// Start HTTP health server for Railway healthchecks
+  const healthPort = process.env.PORT || process.env.RAILWAY_PORT || 3000;
+  const healthServer = http.createServer((req, res) => {
+    if (req.url === '/health') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'ok', service: 'nanoclaw' }));
+    } else {
+      res.writeHead(404);
+      res.end('Not found');
+    }
+  });
+  healthServer.listen(healthPort, () => {
+    logger.info({ port: healthPort }, 'Health server listening');
+  });
+
+  startMessageLoop().catch((err) => {`,
+  );
+
+  fs.writeFileSync(filePath, content);
+  console.log('✓ Patched src/index.ts (added health server)');
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 console.log('Applying NanoClaw Railway patches…');
@@ -403,6 +442,7 @@ try {
   patchContainerRunner();
   patchAgentRunnerIndex();
   patchAgentRunnerMcp();
+  patchIndexAddHealthServer();
   console.log('\nAll patches applied successfully!');
 } catch (err) {
   console.error('Failed to apply patches:', err);
