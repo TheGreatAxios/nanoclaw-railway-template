@@ -39,7 +39,29 @@ NanoClaw works with any Anthropic-compatible API:
    - `ANTHROPIC_API_KEY` = your Together key
    - `ANTHROPIC_BASE_URL` = `https://api.together.xyz/v1`
 
-## Step 4: Deploy
+## Step 4: Create Persistent Volumes
+
+Railway does **not** auto-provision volumes from templates. Without volumes, all data (conversations, sessions, configs) is lost on redeploy or restart.
+
+**Via Railway Dashboard:**
+1. Open your NanoClaw service in Railway
+2. Press `⌘K` (or right-click the canvas) → **Add Volume**
+3. Create these three volumes:
+
+| Volume Name | Mount Path | Purpose |
+|-------------|-----------|---------|
+| `nanoclaw-data` | `/app/data` | SQLite databases & session data |
+| `nanoclaw-store` | `/app/store` | Persistent key-value store |
+| `nanoclaw-groups` | `/app/groups` | Group chat configuration |
+
+**Via Railway CLI:**
+```bash
+railway volume add --mount-path /app/data
+railway volume add --mount-path /app/store
+railway volume add --mount-path /app/groups
+```
+
+## Step 5: Deploy
 
 Railway will automatically build and deploy your NanoClaw instance.
 

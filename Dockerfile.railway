@@ -3,8 +3,8 @@
 
 FROM node:22-slim
 
-# Install system dependencies (no Docker CLI needed — NO_CONTAINER mode)
-RUN apt-get update && apt-get install -y \
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     python3 \
@@ -19,20 +19,19 @@ RUN git clone https://github.com/qwibitai/nanoclaw.git .
 
 # Copy and apply Railway patches (before building)
 COPY patches/ ./patches/
-RUN node patches/apply-railway-patch.js
-
-# Install main dependencies and build
-RUN npm install
-RUN npm run build
+RUN node patches/apply-railway-patch.js \
+    && npm install \
+    && npm run build
 
 # Build agent-runner (separate package with its own dependencies)
-RUN cd container/agent-runner && npm install && npm run build
+WORKDIR /app/container/agent-runner
+RUN npm install && npm run build
 
-# Create necessary directories
-RUN mkdir -p data store groups logs
+WORKDIR /app
 
-# Set permissions
-RUN chmod -R 755 /app
+# Create necessary directories and set permissions
+RUN mkdir -p data store groups logs \
+    && chmod -R 755 /app
 
 # NO_CONTAINER mode — required, Railway doesn't support Docker-in-Docker
 ENV NO_CONTAINER=true

@@ -66,19 +66,11 @@
       "default": "UTC"
     }
   },
-  "volumes": [
-    {
-      "mountPath": "/app/data",
-      "name": "nanoclaw-data"
-    },
-    {
-      "mountPath": "/app/store",
-      "name": "nanoclaw-store"
-    },
-    {
-      "mountPath": "/app/groups",
-      "name": "nanoclaw-groups"
-    }
+  "requiredVolumes": [
+    { "mountPath": "/app/data", "name": "nanoclaw-data", "note": "SQLite databases and session data" },
+    { "mountPath": "/app/store", "name": "nanoclaw-store", "note": "Persistent key-value store" },
+    { "mountPath": "/app/groups", "name": "nanoclaw-groups", "note": "Group chat configuration" }
   ],
+  "_volumeNote": "Railway does not auto-provision volumes from templates. Users must create these volumes manually via the dashboard or CLI after deployment. See QUICKSTART.md.",
   "categories": ["ai", "messaging", "automation"]
 }
