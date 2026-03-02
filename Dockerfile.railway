@@ -34,13 +34,14 @@ WORKDIR /app
 RUN mkdir -p data store groups logs \
     && chmod -R 755 /app
 
+# Copy entrypoint that symlinks store/groups into the volume
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # NO_CONTAINER mode — required, Railway doesn't support Docker-in-Docker
 ENV NO_CONTAINER=true
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-
 EXPOSE 3000
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["npm", "run", "start"]

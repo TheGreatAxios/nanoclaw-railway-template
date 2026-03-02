@@ -408,12 +408,12 @@ function patchIndexAddHealthServer() {
 import http from 'http';`,
   );
 
-  // Find the main() function and add health server startup before it starts the message loop
+  // Start health server at the top of main(), before any blocking operations
   content = content.replace(
-    'startMessageLoop().catch((err) => {',
-    `// Start HTTP health server for Railway healthchecks
+    'async function main(): Promise<void> {',
+    `async function main(): Promise<void> {
   const healthPort = process.env.PORT || process.env.RAILWAY_PORT || 3000;
-  const healthServer = http.createServer((req, res) => {
+  http.createServer((req, res) => {
     if (req.url === '/health') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', service: 'nanoclaw' }));
@@ -421,12 +421,10 @@ import http from 'http';`,
       res.writeHead(404);
       res.end('Not found');
     }
-  });
-  healthServer.listen(healthPort, () => {
+  }).listen(healthPort, () => {
     logger.info({ port: healthPort }, 'Health server listening');
   });
-
-  startMessageLoop().catch((err) => {`,
+`,
   );
 
   fs.writeFileSync(filePath, content);
