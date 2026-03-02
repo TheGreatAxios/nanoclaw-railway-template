@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  nanoclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile.railway
+    container_name: nanoclaw
+    restart: unless-stopped
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}
+      - ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN:-}
+      - CLAUDE_CODE_OAUTH_TOKEN=${CLAUDE_CODE_OAUTH_TOKEN:-}
+      - ASSISTANT_NAME=${ASSISTANT_NAME:-Andy}
+      - ASSISTANT_HAS_OWN_NUMBER=${ASSISTANT_HAS_OWN_NUMBER:-false}
+      - CONTAINER_IMAGE=${CONTAINER_IMAGE:-nanoclaw-agent:latest}
+      - CONTAINER_TIMEOUT=${CONTAINER_TIMEOUT:-1800000}
+      - MAX_CONCURRENT_CONTAINERS=${MAX_CONCURRENT_CONTAINERS:-5}
+      - IDLE_TIMEOUT=${IDLE_TIMEOUT:-1800000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - TZ=${TZ:-UTC}
+    volumes:
+      - nanoclaw-data:/app/data
+      - nanoclaw-store:/app/store
+      - nanoclaw-groups:/app/groups
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nanoclaw-network
+
+volumes:
+  nanoclaw-data:
+  nanoclaw-store:
+  nanoclaw-groups:
+
+networks:
+  nanoclaw-network:
+    driver: bridge

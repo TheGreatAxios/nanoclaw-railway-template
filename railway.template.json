@@ -1,0 +1,84 @@
+{
+  "name": "NanoClaw",
+  "description": "A lightweight AI assistant that runs agents securely in containers. Connects to WhatsApp, has memory, scheduled jobs. Works with Anthropic, OpenRouter, or any Anthropic-compatible API.",
+  "icon": "https://nanoclaw.dev/favicon.ico",
+  "website": "https://nanoclaw.dev",
+  "repository": "https://github.com/qwibitai/nanoclaw",
+  "env": {
+    "ANTHROPIC_API_KEY": {
+      "description": "API key - Anthropic key OR your provider's key (OpenRouter, etc.)",
+      "required": true,
+      "generator": null
+    },
+    "ANTHROPIC_BASE_URL": {
+      "description": "API base URL (leave empty for Anthropic, or use: https://openrouter.ai/api/v1, https://api.together.xyz/v1, http://localhost:11434/v1 for Ollama)",
+      "required": false,
+      "default": ""
+    },
+    "ANTHROPIC_AUTH_TOKEN": {
+      "description": "Additional auth token for certain providers (rarely needed)",
+      "required": false,
+      "default": ""
+    },
+    "CLAUDE_CODE_OAUTH_TOKEN": {
+      "description": "Claude Code OAuth token (optional - for Claude Code integration)",
+      "required": false,
+      "default": ""
+    },
+    "ASSISTANT_NAME": {
+      "description": "Name of your AI assistant (used as trigger word)",
+      "required": false,
+      "default": "Andy"
+    },
+    "ASSISTANT_HAS_OWN_NUMBER": {
+      "description": "Set to 'true' if the assistant has its own WhatsApp number",
+      "required": false,
+      "default": "false"
+    },
+    "CONTAINER_IMAGE": {
+      "description": "Docker image for agent containers",
+      "required": false,
+      "default": "nanoclaw-agent:latest"
+    },
+    "CONTAINER_TIMEOUT": {
+      "description": "Container execution timeout in milliseconds",
+      "required": false,
+      "default": "1800000"
+    },
+    "MAX_CONCURRENT_CONTAINERS": {
+      "description": "Maximum number of concurrent agent containers",
+      "required": false,
+      "default": "5"
+    },
+    "IDLE_TIMEOUT": {
+      "description": "Idle timeout before closing container in milliseconds",
+      "required": false,
+      "default": "1800000"
+    },
+    "LOG_LEVEL": {
+      "description": "Logging level (debug, info, warn, error)",
+      "required": false,
+      "default": "info"
+    },
+    "TZ": {
+      "description": "Timezone for scheduled tasks",
+      "required": false,
+      "default": "UTC"
+    }
+  },
+  "volumes": [
+    {
+      "mountPath": "/app/data",
+      "name": "nanoclaw-data"
+    },
+    {
+      "mountPath": "/app/store",
+      "name": "nanoclaw-store"
+    },
+    {
+      "mountPath": "/app/groups",
+      "name": "nanoclaw-groups"
+    }
+  ],
+  "categories": ["ai", "messaging", "automation"]
+}

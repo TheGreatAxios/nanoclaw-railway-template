@@ -1,0 +1,31 @@
+name: Validate Template
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Template
+        run: node scripts/validate-template.js
+
+      - name: Validate JSON Files
+        run: |
+          cat railway.json | jq empty
+          cat railway.template.json | jq empty
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile.railway

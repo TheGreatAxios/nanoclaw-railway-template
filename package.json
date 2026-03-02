@@ -1,0 +1,24 @@
+{
+  "name": "nanoclaw-railway-template",
+  "version": "1.0.0",
+  "description": "One-click Railway deployment template for NanoClaw",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-template.js"
+  },
+  "keywords": [
+    "nanoclaw",
+    "railway",
+    "template",
+    "ai",
+    "assistant",
+    "whatsapp",
+    "claude"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qwibitai/nanoclaw"
+  }
+}
