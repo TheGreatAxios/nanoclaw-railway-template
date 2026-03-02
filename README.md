@@ -2,7 +2,7 @@
 
 One-click deploy [NanoClaw](https://github.com/qwibitai/nanoclaw) to Railway.
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/YOUR_TEMPLATE_ID)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/uNYqqW?referralCode=ayyhbt&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ## What is NanoClaw?
 
